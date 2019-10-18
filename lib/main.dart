@@ -1,3 +1,5 @@
+import 'dart:ffi';
+
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
@@ -44,19 +46,49 @@ class ShopList extends StatelessWidget {
           case ConnectionState.waiting:
             return Text('Loading...');
           default:
+            final shops =
+                snapshot.data.documents.map((DocumentSnapshot document) {
+              return Shop.fromSnapshot(document);
+            }).toList();
+            shops.sort((a, b) => a.manRate().compareTo(b.manRate()));
+
             return ListView(
-              children:
-                  snapshot.data.documents.map((DocumentSnapshot document) {
-                final timestamp = document['timestamp'] as Timestamp;
-                final dateString = timestamp.toDate().toString();
+              children: shops.map((Shop shop) {
+                final man = shop.man;
+                final woman = shop.woman;
+                final subtitle = '男:$man人 女:$woman人';
+
                 return ListTile(
-                  title: Text(document.documentID),
-                  subtitle: Text(dateString),
+                  title: Text(shop.shopName),
+                  subtitle: Text(subtitle),
                 );
               }).toList(),
             );
         }
       },
     );
+  }
+}
+
+class Shop {
+  Shop.fromSnapshot(DocumentSnapshot document) {
+    shopName = document['shop_name_en'] as String;
+    man = document['man'] as String;
+    woman = document['woman'] as String;
+    timestamp = document['timestamp'] as Timestamp;
+  }
+  String shopName;
+  String man;
+  String woman;
+  Timestamp timestamp;
+
+  double manRate() {
+    final int intMan = int.tryParse(man) ?? 0;
+    final int intWoman = int.tryParse(woman) ?? 0;
+
+    if (intWoman == 0) {
+      return 1000.0;
+    }
+    return (intMan / intWoman).toDouble();
   }
 }
