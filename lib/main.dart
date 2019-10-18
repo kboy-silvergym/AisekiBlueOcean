@@ -1,5 +1,4 @@
-import 'dart:ffi';
-
+import 'package:aiseki/shop.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
@@ -10,27 +9,16 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Flutter Demo',
+      title: '相席ラウンジ集計',
       theme: ThemeData(
         primarySwatch: Colors.red,
       ),
-      home: MyHomePage(title: '相席ラウンジ集計'),
-    );
-  }
-}
-
-class MyHomePage extends StatelessWidget {
-  MyHomePage({Key key, this.title}) : super(key: key);
-
-  final String title;
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text(title),
+      home: Scaffold(
+        appBar: AppBar(
+          title: Text('相席ラウンジ集計'),
+        ),
+        body: ShopList(),
       ),
-      body: ShopList(),
     );
   }
 }
@@ -67,28 +55,5 @@ class ShopList extends StatelessWidget {
         }
       },
     );
-  }
-}
-
-class Shop {
-  Shop.fromSnapshot(DocumentSnapshot document) {
-    shopName = document['shop_name_en'] as String;
-    man = document['man'] as String;
-    woman = document['woman'] as String;
-    timestamp = document['timestamp'] as Timestamp;
-  }
-  String shopName;
-  String man;
-  String woman;
-  Timestamp timestamp;
-
-  double manRate() {
-    final int intMan = int.tryParse(man) ?? 0;
-    final int intWoman = int.tryParse(woman) ?? 0;
-
-    if (intWoman == 0) {
-      return 1000.0;
-    }
-    return (intMan / intWoman).toDouble();
   }
 }
