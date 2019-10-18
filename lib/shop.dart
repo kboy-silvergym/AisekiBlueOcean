@@ -12,13 +12,9 @@ class Shop {
   String woman;
   Timestamp timestamp;
 
-  double manRate() {
+  int manRate() {
     final int intMan = int.tryParse(man) ?? 0;
     final int intWoman = int.tryParse(woman) ?? 0;
-
-    if (intWoman == 0) {
-      return 1000.0;
-    }
-    return (intMan / intWoman).toDouble();
+    return intMan - intWoman;
   }
 }
